@@ -33,7 +33,13 @@
     <script>
         var container, stats;
         var camera, controls, scene, renderer;
-        var objects = new THREE.Group();
+        var objects = [];
+        var objectsR = new THREE.Group();
+        let sphere = new THREE.SphereGeometry( 50, 32, 32 );  
+        let material = new THREE.MeshLambertMaterial({ color: Math.random() * 0x000 })                  
+        let t = new THREE.Mesh(sphere, material);
+        material.transparent = true;
+        material.opacity = 0.3;
         
         init();
         animate();
@@ -43,7 +49,10 @@
             camera = new THREE.PerspectiveCamera(70, window.innerWidth / window.innerHeight, 1, 5000);
             camera.position.z = 1000;
             scene = new THREE.Scene();
-            scene.add(objects);
+            scene.add(objectsR);
+            
+            
+            scene.add(t);
             scene.background = new THREE.Color(0xf0f0f0);
             scene.add(new THREE.AmbientLight(0x505050));
             var light = new THREE.SpotLight(0xffffff, 1.5);
@@ -69,9 +78,10 @@
                 object.scale.z = Math.random() * 2 + 1;
                 //object.castShadow = true;
                 //object.receiveShadow = true;
-                
-                objects.add(object);
+                objects.push(object);
+                objectsR.add(object);
             }
+            
             renderer = new THREE.WebGLRenderer({ antialias: true });
             renderer.setPixelRatio(window.devicePixelRatio);
             renderer.setSize(window.innerWidth, window.innerHeight);
@@ -92,6 +102,7 @@
             controls.target.set(center.x, center.y, center.z);
             var dragControls = new THREE.DragControls(objects, camera, renderer.domElement);
             dragControls.addEventListener('dragstart', function () {
+                console.log("Arrastando")
                 controls.enabled = false;
             });
             dragControls.addEventListener('dragend', function () {
@@ -123,10 +134,12 @@
 
         var selectedObject = null;
         function onDocumentMouseMove(event) {
-            console.log("Teste")
             event.preventDefault();
+            //let color = "#000";
             if (selectedObject) {
-                selectedObject.material.color.set('#69f');
+                //selectedObject.material.color.set(color);
+                //selectedObject.material.color.set('#69f');
+                //console.log(1);
                 selectedObject = null;
             }
             var intersects = getIntersects(event.layerX, event.layerY);
@@ -136,7 +149,17 @@
                 })[0];
                 if (res && res.object) {
                     selectedObject = res.object;
-                    selectedObject.material.color.set('#f00');
+                    console.log(2);
+                    //color = selectedObject.material.color;
+                    //console.log(color);
+                    //selectedObject.material.color.set('#f00');
+                    t.position.x = selectedObject.position.x;
+                    t.position.y = selectedObject.position.y;
+                    t.position.z = selectedObject.position.z;
+                    
+                    t.scale.x = 3;
+                    t.scale.y = 3;
+                    t.scale.z = 3;
                 }
             }
         }
@@ -148,7 +171,7 @@
             y = - (y / window.innerHeight) * 2 + 1;
             mouseVector.set(x, y, 0.5);
             raycaster.setFromCamera(mouseVector, camera);
-            return raycaster.intersectObject(objects, true);
+            return raycaster.intersectObject(objectsR, true);
         }
     </script>
 
