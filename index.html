@@ -2,7 +2,7 @@
 <html lang="en">
 
 <head>
-    <title>ARCHBALLS</title>
+    <title>ARCBALLS</title>
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0">
     <link type="text/css" rel="stylesheet" href="main.css">
@@ -35,12 +35,13 @@
         var camera, controls, scene, renderer;
         var objects = [];
         var objectsR = new THREE.Group();
-        let sphere = new THREE.SphereGeometry( 50, 32, 32 );  
-        let material = new THREE.MeshLambertMaterial({ color: Math.random() * 0x000 })                  
+        let sphere = new THREE.SphereGeometry(50, 32, 32);
+        let material = new THREE.MeshLambertMaterial({ color: Math.random() * 0x000 })
         let t = new THREE.Mesh(sphere, material);
         material.transparent = true;
         material.opacity = 0.3;
-        
+        var selectedObject = null;
+
         init();
         animate();
         function init() {
@@ -50,8 +51,6 @@
             camera.position.z = 1000;
             scene = new THREE.Scene();
             scene.add(objectsR);
-            
-            
             scene.add(t);
             scene.background = new THREE.Color(0xf0f0f0);
             scene.add(new THREE.AmbientLight(0x505050));
@@ -81,40 +80,47 @@
                 objects.push(object);
                 objectsR.add(object);
             }
-            
+
             renderer = new THREE.WebGLRenderer({ antialias: true });
             renderer.setPixelRatio(window.devicePixelRatio);
             renderer.setSize(window.innerWidth, window.innerHeight);
             renderer.shadowMap.enabled = true;
             renderer.shadowMap.type = THREE.PCFShadowMap;
             container.appendChild(renderer.domElement);
-            controls = new THREE.OrbitControls(camera, renderer.domElement);
-            controls.rotateSpeed = 1.0;
+            controls = new THREE.TrackballControls(camera, renderer.domElement);
+            controls.rotateSpeed = 5.0;
             controls.zoomSpeed = 1.2;
             controls.panSpeed = 0.8;
             controls.noZoom = false;
-            controls.noPan = false;
-            controls.staticMoving = true;
+            controls.enablePan = false;
             controls.dynamicDampingFactor = 0.3;
-            var box = new THREE.Box3().setFromObject(scene);
+            var box = new THREE.Box3().setFromObject(objectsR);
             var size = box.getSize(new THREE.Vector3()).length();
             var center = box.getCenter(new THREE.Vector3());
             controls.target.set(center.x, center.y, center.z);
             var dragControls = new THREE.DragControls(objects, camera, renderer.domElement);
             dragControls.addEventListener('dragstart', function () {
-                console.log("Arrastando")
                 controls.enabled = false;
             });
             dragControls.addEventListener('dragend', function () {
                 controls.enabled = true;
-                box = new THREE.Box3().setFromObject(scene);
-                size = box.getSize(new THREE.Vector3()).length();
+                box = new THREE.Box3().setFromObject(objectsR);
+                size = box.getSize(new THREE.Vector3());
                 center = box.getCenter(new THREE.Vector3());
                 controls.target.set(center.x, center.y, center.z);
+                t.position.x = center.x;
+                t.position.y = center.y;
+                t.position.z = center.z;
+                let bola = new THREE.Sphere();
+                box.getBoundingSphere(bola);
+                t.scale.x = bola.radius / 50;
+                t.scale.y = bola.radius / 50;
+                t.scale.z = bola.radius / 50;
             });
             stats = new Stats();
-            window.addEventListener("mousemove", onDocumentMouseMove, false);
+            //window.addEventListener("mousemove", onDocumentMouseMove, false);
             window.addEventListener('resize', onWindowResize, false);
+            window.addEventListener('dblclick', mouseDBClick);
         }
         function onWindowResize() {
             camera.aspect = window.innerWidth / window.innerHeight;
@@ -132,7 +138,49 @@
             renderer.render(scene, camera);
         }
 
-        var selectedObject = null;
+        
+
+        function mouseDBClick(event) {
+            event.preventDefault();
+            if (selectedObject) {
+                selectedObject = null;
+            }
+            var intersects = getIntersects(event.layerX, event.layerY);
+            if (intersects.length > 0) {
+                var res = intersects.filter(function (res) {
+                    return res && res.object;
+                })[0];
+                if (res && res.object) {
+                    selectedObject = res.object;
+                    box = new THREE.Box3().setFromObject(selectedObject)
+                    size = box.getSize(new THREE.Vector3());
+                center = box.getCenter(new THREE.Vector3());
+                    t.position.x = center.x;
+                    t.position.y = center.y;
+                    t.position.z = center.z;
+                    let bola = new THREE.Sphere();
+                    box.getBoundingSphere(bola);
+                    t.scale.x = bola.radius / 50;
+                    t.scale.y = bola.radius / 50;
+                    t.scale.z = bola.radius / 50;
+                    console.log(2);
+                }
+            } else {
+                box = new THREE.Box3().setFromObject(objectsR);
+                size = box.getSize(new THREE.Vector3());
+                center = box.getCenter(new THREE.Vector3());
+                controls.target.set(center.x, center.y, center.z);
+                t.position.x = center.x;
+                t.position.y = center.y;
+                t.position.z = center.z;
+                let bola = new THREE.Sphere();
+                box.getBoundingSphere(bola);
+                t.scale.x = bola.radius / 50;
+                t.scale.y = bola.radius / 50;
+                t.scale.z = bola.radius / 50;
+            }
+        }
+
         function onDocumentMouseMove(event) {
             event.preventDefault();
             //let color = "#000";
@@ -149,17 +197,7 @@
                 })[0];
                 if (res && res.object) {
                     selectedObject = res.object;
-                    console.log(2);
-                    //color = selectedObject.material.color;
-                    //console.log(color);
-                    //selectedObject.material.color.set('#f00');
-                    t.position.x = selectedObject.position.x;
-                    t.position.y = selectedObject.position.y;
-                    t.position.z = selectedObject.position.z;
-                    
-                    t.scale.x = 3;
-                    t.scale.y = 3;
-                    t.scale.z = 3;
+                    //console.log(2);
                 }
             }
         }
