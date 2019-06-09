@@ -32,12 +32,13 @@
 
     <script>
         var container, stats;
-        var camera, controls, scene, renderer;
+        var camera, controls, scene, renderer, dragControls;
         var objects = [];
         var objectsR = new THREE.Group();
         let sphere = new THREE.SphereGeometry(50, 32, 32);
         let material = new THREE.MeshLambertMaterial({ color: Math.random() * 0x000 })
         let t = new THREE.Mesh(sphere, material);
+        t.visible = false;
         material.transparent = true;
         material.opacity = 0.3;
         var selectedObject = null;
@@ -50,6 +51,7 @@
             camera = new THREE.PerspectiveCamera(70, window.innerWidth / window.innerHeight, 1, 5000);
             camera.position.z = 1000;
             scene = new THREE.Scene();
+            
             scene.add(objectsR);
             scene.add(t);
             scene.background = new THREE.Color(0xf0f0f0);
@@ -98,24 +100,25 @@
             var size = box.getSize(new THREE.Vector3()).length();
             var center = box.getCenter(new THREE.Vector3());
             controls.target.set(center.x, center.y, center.z);
-            var dragControls = new THREE.DragControls(objects, camera, renderer.domElement);
+            dragControls = new THREE.DragControls(objects, camera, renderer.domElement);
+            controls.enabled = false;
             dragControls.addEventListener('dragstart', function () {
-                controls.enabled = false;
+                controls.enabled = t.visible && selectedObject==null;
             });
             dragControls.addEventListener('dragend', function () {
-                controls.enabled = true;
+                controls.enabled = false;
                 box = new THREE.Box3().setFromObject(objectsR);
                 size = box.getSize(new THREE.Vector3());
                 center = box.getCenter(new THREE.Vector3());
                 controls.target.set(center.x, center.y, center.z);
-                t.position.x = center.x;
-                t.position.y = center.y;
-                t.position.z = center.z;
-                let bola = new THREE.Sphere();
-                box.getBoundingSphere(bola);
-                t.scale.x = bola.radius / 50;
-                t.scale.y = bola.radius / 50;
-                t.scale.z = bola.radius / 50;
+                // t.position.x = center.x;
+                // t.position.y = center.y;
+                // t.position.z = center.z;
+                // let bola = new THREE.Sphere();
+                // box.getBoundingSphere(bola);
+                // t.scale.x = bola.radius / 50;
+                // t.scale.y = bola.radius / 50;
+                // t.scale.z = bola.radius / 50;
             });
             stats = new Stats();
             //window.addEventListener("mousemove", onDocumentMouseMove, false);
@@ -138,32 +141,37 @@
             renderer.render(scene, camera);
         }
 
-        
+
 
         function mouseDBClick(event) {
+            controls.enabled = false;   
             event.preventDefault();
-            if (selectedObject) {
-                selectedObject = null;
-            }
+            // if (selectedObject) {
+            //     selectedObject = null;
+            // }
             var intersects = getIntersects(event.layerX, event.layerY);
             if (intersects.length > 0) {
                 var res = intersects.filter(function (res) {
                     return res && res.object;
                 })[0];
                 if (res && res.object) {
-                    selectedObject = res.object;
-                    box = new THREE.Box3().setFromObject(selectedObject)
-                    size = box.getSize(new THREE.Vector3());
-                center = box.getCenter(new THREE.Vector3());
-                    t.position.x = center.x;
-                    t.position.y = center.y;
-                    t.position.z = center.z;
-                    let bola = new THREE.Sphere();
-                    box.getBoundingSphere(bola);
-                    t.scale.x = bola.radius / 50;
-                    t.scale.y = bola.radius / 50;
-                    t.scale.z = bola.radius / 50;
-                    console.log(2);
+                    if (selectedObject == res.object) {
+                        t.visible = false;
+                    } else {
+                        selectedObject = res.object;
+                        box = new THREE.Box3().setFromObject(selectedObject)
+                        size = box.getSize(new THREE.Vector3());
+                        center = box.getCenter(new THREE.Vector3());
+                        t.position.x = center.x;
+                        t.position.y = center.y;
+                        t.position.z = center.z;
+                        let bola = new THREE.Sphere();
+                        box.getBoundingSphere(bola);
+                        t.scale.x = bola.radius / 50;
+                        t.scale.y = bola.radius / 50;
+                        t.scale.z = bola.radius / 50;
+                        t.visible = true;
+                    }
                 }
             } else {
                 box = new THREE.Box3().setFromObject(objectsR);
@@ -178,7 +186,11 @@
                 t.scale.x = bola.radius / 50;
                 t.scale.y = bola.radius / 50;
                 t.scale.z = bola.radius / 50;
+                t.visible = t.visible?false:true;
+                controls.enabled = t.visible;
             }
+
+            dragControls.enabled = !t.visible;
         }
 
         function onDocumentMouseMove(event) {
