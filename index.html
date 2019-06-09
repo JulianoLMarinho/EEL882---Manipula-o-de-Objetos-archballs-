@@ -31,6 +31,8 @@
 
 
     <script>
+
+
         var container, stats;
         var camera, controls, scene, renderer, dragControls;
         var objects = [];
@@ -42,16 +44,20 @@
         material.transparent = true;
         material.opacity = 0.3;
         var selectedObject = null;
-
+        var selectedObjectToDrag = null;
+        var plane = null;
         init();
         animate();
         function init() {
+
             container = document.createElement('div');
             document.body.appendChild(container);
             camera = new THREE.PerspectiveCamera(70, window.innerWidth / window.innerHeight, 1, 5000);
             camera.position.z = 1000;
             scene = new THREE.Scene();
-            
+            plane = new THREE.Mesh(new THREE.PlaneBufferGeometry(5000, 5000, 8, 8), new THREE.MeshBasicMaterial({color: 0xffffff, opacity: 0.0, transparent:true}));
+            //plane.visible = false;
+            scene.add(plane);
             scene.add(objectsR);
             scene.add(t);
             scene.background = new THREE.Color(0xf0f0f0);
@@ -100,30 +106,94 @@
             var size = box.getSize(new THREE.Vector3()).length();
             var center = box.getCenter(new THREE.Vector3());
             controls.target.set(center.x, center.y, center.z);
-            dragControls = new THREE.DragControls(objects, camera, renderer.domElement);
+            // dragControls = new THREE.DragControls(objects, camera, renderer.domElement);
             controls.enabled = false;
-            dragControls.addEventListener('dragstart', function () {
-                controls.enabled = t.visible && selectedObject==null;
-            });
-            dragControls.addEventListener('dragend', function () {
-                controls.enabled = false;
-                box = new THREE.Box3().setFromObject(objectsR);
-                size = box.getSize(new THREE.Vector3());
-                center = box.getCenter(new THREE.Vector3());
-                controls.target.set(center.x, center.y, center.z);
-                // t.position.x = center.x;
-                // t.position.y = center.y;
-                // t.position.z = center.z;
-                // let bola = new THREE.Sphere();
-                // box.getBoundingSphere(bola);
-                // t.scale.x = bola.radius / 50;
-                // t.scale.y = bola.radius / 50;
-                // t.scale.z = bola.radius / 50;
-            });
+            // dragControls.addEventListener('dragstart', function () {
+            //     controls.enabled = t.visible && selectedObject==null;
+            // });
+            // dragControls.addEventListener('dragend', function () {
+            //     controls.enabled = false;
+            //     box = new THREE.Box3().setFromObject(objectsR);
+            //     size = box.getSize(new THREE.Vector3());
+            //     center = box.getCenter(new THREE.Vector3());
+            //     controls.target.set(center.x, center.y, center.z);
+            //     // t.position.x = center.x;
+            //     // t.position.y = center.y;
+            //     // t.position.z = center.z;
+            //     // let bola = new THREE.Sphere();
+            //     // box.getBoundingSphere(bola);
+            //     // t.scale.x = bola.radius / 50;
+            //     // t.scale.y = bola.radius / 50;
+            //     // t.scale.z = bola.radius / 50;
+            // });
             stats = new Stats();
             //window.addEventListener("mousemove", onDocumentMouseMove, false);
             window.addEventListener('resize', onWindowResize, false);
             window.addEventListener('dblclick', mouseDBClick);
+            window.addEventListener('mousedown', mouseDownEvent);
+            window.addEventListener('mouseup', mouseUpEvent);
+            window.addEventListener('mousemove', mouseMoveEvent);
+
+        }
+        var offset =  new THREE.Vector3();
+        function mouseDownEvent(event){
+            // Get mouse position
+            if(!t.visible){
+                var mouseX = (event.clientX / window.innerWidth) * 2 - 1;
+                var mouseY = -(event.clientY / window.innerHeight) * 2 + 1;
+                // Get 3D vector from 3D mouse position using 'unproject' function
+                var vector = new THREE.Vector3(mouseX, mouseY, 1);
+                vector.unproject(camera);
+                // Set the raycaster position
+                raycaster.set( camera.position, vector.sub( camera.position ).normalize() );
+                // Find all intersected objects
+                var intersects = raycaster.intersectObjects(objects);
+                if (intersects.length > 0) {
+                    // Disable the controls
+                    controls.enabled = false;
+                    // Set the selection - first intersected object
+                    selectedObjectToDrag = intersects[0].object;
+                    // Calculate the offset
+                    var intersects = raycaster.intersectObject(plane);
+                    offset.copy(intersects[0].point).sub(plane.position);
+                }
+            }
+        }
+
+        function mouseUpEvent(event){
+            //controls.enabled = true;
+            selectedObjectToDrag = null;
+        }
+
+        function mouseMoveEvent(event){
+            if(!t.visible){
+                event.preventDefault();
+                // Get mouse position
+                var mouseX = (event.clientX / window.innerWidth) * 2 - 1;
+                var mouseY = -(event.clientY / window.innerHeight) * 2 + 1;
+                // Get 3D vector from 3D mouse position using 'unproject' function
+                var vector = new THREE.Vector3(mouseX, mouseY, 1);
+                vector.unproject(camera);
+                // Set the raycaster position
+                raycaster.set( camera.position, vector.sub( camera.position ).normalize() );
+                if (selectedObjectToDrag) {
+                    // Check the position where the plane is intersected
+                    var intersects = raycaster.intersectObject(plane);
+                    // Reposition the object based on the intersection point with the plane
+                    selectedObjectToDrag.position.copy(intersects[0].point.sub(offset));
+                } else {
+                    // Update position of the plane if need
+                    var intersects = raycaster.intersectObjects(objects);
+                    if (intersects.length > 0) {
+                        plane.position.copy(intersects[0].object.position);
+                        plane.lookAt(camera.position);
+                    }
+                }
+            } else {
+                if(selectedObject){
+                    selectedObject.rotation.x += 0.005
+                }
+            }
         }
         function onWindowResize() {
             camera.aspect = window.innerWidth / window.innerHeight;
@@ -144,7 +214,7 @@
 
 
         function mouseDBClick(event) {
-            controls.enabled = false;   
+            //controls.enabled = false;
             event.preventDefault();
             // if (selectedObject) {
             //     selectedObject = null;
@@ -157,6 +227,7 @@
                 if (res && res.object) {
                     if (selectedObject == res.object) {
                         t.visible = false;
+                        selectedObject = null;
                     } else {
                         selectedObject = res.object;
                         box = new THREE.Box3().setFromObject(selectedObject)
@@ -190,7 +261,7 @@
                 controls.enabled = t.visible;
             }
 
-            dragControls.enabled = !t.visible;
+            //dragControls.enabled = !t.visible;
         }
 
         function onDocumentMouseMove(event) {
