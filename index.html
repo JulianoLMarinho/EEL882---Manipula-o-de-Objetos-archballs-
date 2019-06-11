@@ -105,7 +105,7 @@
             var box = new THREE.Box3().setFromObject(objectsR);
             var size = box.getSize(new THREE.Vector3()).length();
             var center = box.getCenter(new THREE.Vector3());
-            controls.target.set(center.x, center.y, center.z);
+            //controls.target.set(center.x, center.y, center.z);
             // dragControls = new THREE.DragControls(objects, camera, renderer.domElement);
             controls.enabled = false;
             // dragControls.addEventListener('dragstart', function () {
@@ -136,6 +136,8 @@
 
         }
         var offset =  new THREE.Vector3();
+        var firstclickpoint = new THREE.Vector3();
+
         function mouseDownEvent(event){
             // Get mouse position
             if(!t.visible){
@@ -167,6 +169,7 @@
 
         function mouseMoveEvent(event){
             if(!t.visible){
+                //objectsR.rotation.x += 0.005;
                 event.preventDefault();
                 // Get mouse position
                 var mouseX = (event.clientX / window.innerWidth) * 2 - 1;
@@ -190,8 +193,25 @@
                     }
                 }
             } else {
+                //.DefaultUp = new THREE.Vector3( 0, 1, 0 );
                 if(selectedObject){
-                    selectedObject.rotation.x += 0.005
+                    ///objectsR.rotation.z += 0.005;
+                    console.log("Click", firstclickpoint);
+                    box = new THREE.Box3().setFromObject(selectedObject);
+                    center = box.getCenter(new THREE.Vector3());
+                    console.log("Centro", center);
+                    var material = new THREE.LineBasicMaterial({
+                        color: 0x0000ff
+                    });
+
+                    var geometry = new THREE.Geometry();
+                    geometry.vertices.push(
+                        center,
+                        firstclickpoint
+                    );
+
+                    var line = new THREE.Line( geometry, material );
+                    scene.add( line );
                 }
             }
         }
@@ -242,13 +262,14 @@
                         t.scale.y = bola.radius / 50;
                         t.scale.z = bola.radius / 50;
                         t.visible = true;
+
                     }
                 }
             } else {
                 box = new THREE.Box3().setFromObject(objectsR);
                 size = box.getSize(new THREE.Vector3());
                 center = box.getCenter(new THREE.Vector3());
-                controls.target.set(center.x, center.y, center.z);
+                //controls.target.set(center.x, center.y, center.z);
                 t.position.x = center.x;
                 t.position.y = center.y;
                 t.position.z = center.z;
@@ -259,8 +280,14 @@
                 t.scale.z = bola.radius / 50;
                 t.visible = t.visible?false:true;
                 controls.enabled = t.visible;
+                // objectsR.position.x = center.x;
+                // objectsR.position.y = center.y;
+                // objectsR.position.z = center.z;
             }
-
+            var mouseX = (event.clientX / window.innerWidth) * 2 - 1;
+            var mouseY = -(event.clientY / window.innerHeight) * 2 + 1;
+            // Get 3D vector from 3D mouse position using 'unproject' function
+            firstclickpoint = new THREE.Vector3(mouseX, mouseY, 1);
             //dragControls.enabled = !t.visible;
         }
 
@@ -293,6 +320,24 @@
             mouseVector.set(x, y, 0.5);
             raycaster.setFromCamera(mouseVector, camera);
             return raycaster.intersectObject(objectsR, true);
+        }
+
+        function rotateAboutPoint(obj, point, axis, theta, pointIsWorld){
+            pointIsWorld = (pointIsWorld === undefined)? false : pointIsWorld;
+
+            if(pointIsWorld){
+                obj.parent.localToWorld(obj.position); // compensate for world coordinate
+            }
+
+            obj.position.sub(point); // remove the offset
+            obj.position.applyAxisAngle(axis, theta); // rotate the POSITION
+            obj.position.add(point); // re-add the offset
+
+            if(pointIsWorld){
+                obj.parent.worldToLocal(obj.position); // undo world coordinates compensation
+            }
+
+            obj.rotateOnAxis(axis, theta); // rotate the OBJECT
         }
     </script>
 
