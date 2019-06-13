@@ -37,6 +37,7 @@
         var camera, controls, scene, renderer, dragControls;
         var objects = [];
         var objectsR = new THREE.Group();
+        objectsR.name = "teste";
         let sphere = new THREE.SphereGeometry(50, 32, 32);
         let material = new THREE.MeshLambertMaterial({ color: Math.random() * 0x000 })
         let t = new THREE.Mesh(sphere, material);
@@ -144,11 +145,13 @@
                 var mouseX = (event.clientX / window.innerWidth) * 2 - 1;
                 var mouseY = -(event.clientY / window.innerHeight) * 2 + 1;
                 // Get 3D vector from 3D mouse position using 'unproject' function
-                var vector = new THREE.Vector3(mouseX, mouseY, 1);
+                var vector = new THREE.Vector3(mouseX, mouseY, -1);
                 vector.unproject(camera);
+                firstclickpoint.copy(vector);
                 // Set the raycaster position
                 raycaster.set( camera.position, vector.sub( camera.position ).normalize() );
                 // Find all intersected objects
+                // console.log(vector);
                 var intersects = raycaster.intersectObjects(objects);
                 if (intersects.length > 0) {
                     // Disable the controls
@@ -168,14 +171,15 @@
         }
 
         function mouseMoveEvent(event){
+            var mouseX = (event.clientX / window.innerWidth) * 2 - 1;
+            var mouseY = -(event.clientY / window.innerHeight) * 2 + 1;
+            // Get 3D vector from 3D mouse position using 'unproject' function
+            var vector = new THREE.Vector3(mouseX, mouseY, 1);
             if(!t.visible){
                 //objectsR.rotation.x += 0.005;
                 event.preventDefault();
                 // Get mouse position
-                var mouseX = (event.clientX / window.innerWidth) * 2 - 1;
-                var mouseY = -(event.clientY / window.innerHeight) * 2 + 1;
-                // Get 3D vector from 3D mouse position using 'unproject' function
-                var vector = new THREE.Vector3(mouseX, mouseY, 1);
+
                 vector.unproject(camera);
                 // Set the raycaster position
                 raycaster.set( camera.position, vector.sub( camera.position ).normalize() );
@@ -196,21 +200,39 @@
                 //.DefaultUp = new THREE.Vector3( 0, 1, 0 );
                 if(selectedObject){
                     ///objectsR.rotation.z += 0.005;
-                    console.log("Click", firstclickpoint);
+                    // console.log("Click", firstclickpoint);
                     box = new THREE.Box3().setFromObject(selectedObject);
                     center = box.getCenter(new THREE.Vector3());
-                    console.log("Centro", center);
+                    // console.log("Centro", center);
                     var material = new THREE.LineBasicMaterial({
                         color: 0x0000ff
                     });
 
+                    var t3 = new THREE.Vector3();
+                    t3.x = firstclickpoint.x - center.x;
+                    t3.y = firstclickpoint.y - center.y;
+                    t3.z = firstclickpoint.z - center.z;
+
+                    // console.log(vector.unproject(camera));
+                    vector.unproject(camera)
+                    var t2 = new THREE.Vector3();
+                    t2.x = vector.x - center.x;
+                    t2.y = vector.y - center.y;
+                    t2.z = vector.z - center.z;
+                    // console.log("mouse", t2);
+                    // console.log("first", t3);
+                    // console.log("center", center);
+                    // console.log("vector", vector);
+
+
                     var geometry = new THREE.Geometry();
                     geometry.vertices.push(
                         center,
-                        firstclickpoint
+                        vector
                     );
 
                     var line = new THREE.Line( geometry, material );
+                    console.log(line);
                     scene.add( line );
                 }
             }
