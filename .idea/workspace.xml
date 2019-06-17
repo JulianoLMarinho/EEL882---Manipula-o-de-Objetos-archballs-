@@ -19,8 +19,8 @@
       <file pinned="false" current-in-tab="true">
         <entry file="file://$PROJECT_DIR$/index.html">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="178">
-              <caret line="218" column="65" selection-start-line="218" selection-start-column="65" selection-end-line="218" selection-end-column="65" />
+            <state relative-caret-position="580">
+              <caret line="264" lean-forward="true" selection-start-line="264" selection-end-line="264" />
             </state>
           </provider>
         </entry>
@@ -29,7 +29,7 @@
         <entry file="file://$PROJECT_DIR$/js/three.js">
           <provider selected="true" editor-type-id="text-editor">
             <state relative-caret-position="186">
-              <caret line="44471" column="33" lean-forward="true" selection-start-line="44471" selection-start-column="33" selection-end-line="44471" selection-end-column="33" />
+              <caret line="44471" column="33" selection-start-line="44471" selection-start-column="33" selection-end-line="44471" selection-end-column="33" />
             </state>
           </provider>
         </entry>
@@ -37,7 +37,7 @@
       <file pinned="false" current-in-tab="false">
         <entry file="file://$PROJECT_DIR$/js/TrackballControls.js">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="-4505">
+            <state relative-caret-position="17">
               <caret line="120" column="24" selection-start-line="120" selection-start-column="8" selection-end-line="120" selection-end-column="24" />
             </state>
           </provider>
@@ -59,6 +59,7 @@
       <find>teste</find>
       <find>intersects</find>
       <find>firstclickpoint</find>
+      <find>controls.enabled</find>
     </findStrings>
   </component>
   <component name="Git.Settings">
@@ -153,7 +154,8 @@
       <workItem from="1560129566011" duration="599000" />
       <workItem from="1560211572899" duration="7206000" />
       <workItem from="1560386780954" duration="6584000" />
-      <workItem from="1560612967319" duration="14448000" />
+      <workItem from="1560612967319" duration="15704000" />
+      <workItem from="1560720367845" duration="9990000" />
     </task>
     <task id="LOCAL-00001" summary="Iniciando o Trabalho">
       <created>1559009249695</created>
@@ -166,10 +168,10 @@
     <servers />
   </component>
   <component name="TimeTrackingManager">
-    <option name="totallyTimeSpent" value="47147000" />
+    <option name="totallyTimeSpent" value="58393000" />
   </component>
   <component name="ToolWindowManager">
-    <frame x="-8" y="-8" width="1382" height="744" extended-state="6" />
+    <frame x="-8" y="-8" width="1936" height="1056" extended-state="6" />
     <editor active="true" />
     <layout>
       <window_info content_ui="combo" id="Project" order="0" weight="0.24851191" />
@@ -184,7 +186,7 @@
       <window_info anchor="bottom" id="TODO" order="6" />
       <window_info anchor="bottom" id="Docker" order="7" show_stripe_button="false" />
       <window_info anchor="bottom" id="Version Control" order="8" />
-      <window_info anchor="bottom" id="Terminal" order="9" weight="0.19476268" />
+      <window_info active="true" anchor="bottom" id="Terminal" order="9" visible="true" weight="0.1928494" />
       <window_info anchor="bottom" id="Event Log" order="10" side_tool="true" />
       <window_info anchor="right" id="Commander" internal_type="SLIDING" order="0" type="SLIDING" weight="0.4" />
       <window_info anchor="right" id="Ant Build" order="1" weight="0.25" />
@@ -254,24 +256,24 @@
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/js/TrackballControls.js">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="-4505">
-          <caret line="120" column="24" selection-start-line="120" selection-start-column="8" selection-end-line="120" selection-end-column="24" />
-        </state>
-      </provider>
-    </entry>
     <entry file="file://$PROJECT_DIR$/js/three.js">
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="186">
-          <caret line="44471" column="33" lean-forward="true" selection-start-line="44471" selection-start-column="33" selection-end-line="44471" selection-end-column="33" />
+          <caret line="44471" column="33" selection-start-line="44471" selection-start-column="33" selection-end-line="44471" selection-end-column="33" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/js/TrackballControls.js">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="17">
+          <caret line="120" column="24" selection-start-line="120" selection-start-column="8" selection-end-line="120" selection-end-column="24" />
         </state>
       </provider>
     </entry>
     <entry file="file://$PROJECT_DIR$/index.html">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="178">
-          <caret line="218" column="65" selection-start-line="218" selection-start-column="65" selection-end-line="218" selection-end-column="65" />
+        <state relative-caret-position="580">
+          <caret line="264" lean-forward="true" selection-start-line="264" selection-end-line="264" />
         </state>
       </provider>
     </entry>

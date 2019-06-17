@@ -73,17 +73,17 @@
             light.shadow.mapSize.height = 1024;
             scene.add(light);
             var geometry = new THREE.BoxBufferGeometry(40, 40, 40);
-            for (var i = 0; i < 5; i++) {
+            for (var i = 0; i < 1; i++) {
                 var object = new THREE.Mesh(geometry, new THREE.MeshLambertMaterial({ color: Math.random() * 0xffffff }));
-                object.position.x = Math.random() * 500 - 500;
-                object.position.y = Math.random() * 500 - 500;
-                object.position.z = Math.random() * 500 - 500;
-                object.rotation.x = Math.random() * 2 * Math.PI;
-                object.rotation.y = Math.random() * 2 * Math.PI;
-                object.rotation.z = Math.random() * 2 * Math.PI;
-                object.scale.x = Math.random() * 2 + 1;
-                object.scale.y = Math.random() * 2 + 1;
-                object.scale.z = Math.random() * 2 + 1;
+                // object.position.x = Math.random() * 250;
+                // object.position.y = Math.random() * 252;
+                // object.position.z = Math.random() * 250;
+                // object.rotation.x = Math.random() * 2 * Math.PI;
+                // object.rotation.y = Math.random() * 2 * Math.PI;
+                // object.rotation.z = Math.random() * 2 * Math.PI;
+                object.scale.x = Math.random() * 5 + 1;
+                object.scale.y = Math.random() * 5 + 1;
+                object.scale.z = Math.random() * 5 + 1;
                 //object.castShadow = true;
                 //object.receiveShadow = true;
                 objects.push(object);
@@ -138,7 +138,7 @@
         }
         var offset =  new THREE.Vector3();
         var firstclickpoint = new THREE.Vector3();
-
+        var rotaciona = false;
         function mouseDownEvent(event){
 
             // Get mouse position
@@ -148,7 +148,6 @@
                 // Get 3D vector from 3D mouse position using 'unproject' function
                 var vector = new THREE.Vector3(mouseX, mouseY, 1);
                 vector.unproject(camera);
-                firstclickpoint = getSphereClickPosition(vector, t);
                 // Set the raycaster position
                 raycaster.set( camera.position, vector.sub( camera.position ).normalize() );
                 // Find all intersected objects
@@ -163,18 +162,28 @@
                     var intersects = raycaster.intersectObject(plane);
                     offset.copy(intersects[0].point).sub(plane.position);
                 }
+            } else {
+                var mouseX = (event.clientX / window.innerWidth) * 2 - 1;
+                var mouseY = -(event.clientY / window.innerHeight) * 2 + 1;
+                // Get 3D vector from 3D mouse position using 'unproject' function
+                var vector = new THREE.Vector3(mouseX, mouseY, 1);
+                vector.unproject(camera);
+                firstclickpoint.copy(getSphereClickPosition(vector, t));
+                rotaciona = true;
             }
         }
 
         function getSphereClickPosition(clientVector, sphere){
-            raycaster.set( camera.position, clientVector.sub( camera.position ).normalize() );
+            var vec = new THREE.Vector3().copy(clientVector);
+            raycaster.set( camera.position, vec.sub( camera.position ).normalize() );
             var intersects = raycaster.intersectObject(sphere);
-            return intersects[0].point.sub(sphere.position);
+            return intersects[0].point;
         }
 
         function mouseUpEvent(event){
             //controls.enabled = true;
             selectedObjectToDrag = null;
+            rotaciona = false;
         }
         var oij = 0;
         function mouseMoveEvent(event){
@@ -211,12 +220,12 @@
                     ///objectsR.rotation.z += 0.005;
                     // console.log("Click", firstclickpoint);
                     box = new THREE.Box3().setFromObject(selectedObject);
-                    center = box.getCenter(new THREE.Vector3());
-                    // console.log("Centro", center);
+                    center = t.position;
+                    console.log("Centro", center);
                     var material = new THREE.LineBasicMaterial({
                         color: 0x0000ff
                     });
-                    console.log(selectedObject.getWorldPosition());
+                    //console.log(selectedObject.getWorldPosition());
                     // var t3 = new THREE.Vector3();
                     // t3.x = firstclickpoint.x - center.x;
                     // t3.y = firstclickpoint.y - center.y;
@@ -227,24 +236,37 @@
                     vector.unproject(camera);
                     // var t2 = new THREE.Vector3();
                     var p = getSphereClickPosition(vector, t);
-                    var pcamera = new THREE.Vector3().copy(p).project(camera);
-                    var firstcamera = new THREE.Vector3().copy(firstclickpoint).project(camera);
+                    var pcamera = new THREE.Vector3().copy(p);
+                    var firstcamera = new THREE.Vector3().copy(firstclickpoint);
                     var hj = new THREE.Vector3();
+
                     // p.sub(center);
                     // firstclickpoint.sub(center);
+                    // console.log(p);
 
-                    if(oij>0){
-                        hj.crossVectors(pcamera,firstcamera);
+                    if(rotaciona){
+                        hj.crossVectors(firstclickpoint,p);
+                        console.log(hj);
                         //console.log("angle", p.angleTo(firstclickpoint));
                         // console.log(event);
                         // console.log("first", t3);
                         // console.log("center", center);
                         // console.log("vector", vector);
                         // console.log(p.angleTo(firstclickpoint));
-                         selectedObject.rotateOnAxis(hj.normalize(), -p.angleTo(firstclickpoint));
+                        var geometry = new THREE.Geometry();
+                        geometry.vertices.push(
+                            center,
+                            firstclickpoint
+                        );
+
+                        var line = new THREE.Line( geometry, material );
+                        // console.log(line);
+                        // scene.add( line );
+
+                        selectedObject.rotateOnWorldAxis(hj.normalize(), firstclickpoint.angleTo(p));
 
                         // console.log(hj);
-                        // t.rotateOnAxis(hj, -firstclickpoint.angleTo(p));
+                        //t.rotateOnWorldAxis(hj, firstclickpoint.angleTo(p));
                     }
                     //selectedObject.rotateOnAxis(new THREE.Vector3(-503,0,0), 0.01);
 
@@ -253,14 +275,18 @@
                     // console.log(hj);
                     //console.log(p.project(camera));
                     var geometry = new THREE.Geometry();
-                    geometry.vertices.push(
-                        center,
-                        p
-                    );
-
-                    var line = new THREE.Line( geometry, material );
-                    // console.log(line);
-                    scene.add( line );
+                    var l = new THREE.Vector3();
+                    //selectedObject.getWorldPosition(l);
+                    // console.log("objewto",l);
+                    // console.log("esfera", center);
+                    // geometry.vertices.push(
+                    //     center,
+                    //     p
+                    // );
+                    //
+                    // var line = new THREE.Line( geometry, material );
+                    // // console.log(line);
+                    // scene.add( line );
                 }
             }
         }
@@ -328,7 +354,7 @@
                 t.scale.y = bola.radius / 50;
                 t.scale.z = bola.radius / 50;
                 t.visible = t.visible?false:true;
-                controls.enabled = t.visible;
+                //controls.enabled = t.visible;
                 // objectsR.position.x = center.x;
                 // objectsR.position.y = center.y;
                 // objectsR.position.z = center.z;
