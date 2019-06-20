@@ -37,9 +37,9 @@
         var camera, controls, scene, renderer, dragControls;
         var objects = [];
         var objectsR = new THREE.Group();
-        objectsR.name = "teste";
-        var testeesfe = new THREE.Group();
-        testeesfe.add(objectsR);
+        objectsR.name = "grupo";
+        var grupo = new THREE.Group();
+        grupo.add(objectsR);
         let sphere = new THREE.SphereGeometry(50, 32, 32);
         let material = new THREE.MeshLambertMaterial({ color: Math.random() * 0x000 })
         let t = new THREE.Mesh(sphere, material);
@@ -62,8 +62,8 @@
             plane = new THREE.Mesh(new THREE.PlaneBufferGeometry(5000, 5000, 8, 8), new THREE.MeshBasicMaterial({color: 0xffffff, opacity: 0.0, transparent:true}));
             //plane.visible = false;
             scene.add(plane);
-            scene.add(testeesfe);
-            testeesfe.add(t);
+            scene.add(grupo);
+            grupo.add(t);
             scene.background = new THREE.Color(0xf0f0f0);
             scene.add(new THREE.AmbientLight(0x505050));
             var light = new THREE.SpotLight(0xffffff, 1.5);
@@ -184,32 +184,38 @@
                 if(selectedObject){
                     var center = t.position;
                     vector.unproject(camera);
-                    var h = t.clone();
-                    var p = getSphereClickPosition(vector, h);
-                    var pcamera = new THREE.Vector3().copy(p);
-                    var firstcamera = new THREE.Vector3().copy(firstclickpoint);
-                    var hj = new THREE.Vector3();
+                    var lastclickpoint = getSphereClickPosition(vector, t);
+                    var lastclickpoint2 = new THREE.Vector3().copy(lastclickpoint);
+                    var firstclickpoint2 = new THREE.Vector3().copy(firstclickpoint);
 
-                    pcamera.sub(center);
-                    firstcamera.sub(center);
+                    //Calcula a normal entre o ultimo clique no mouse na esfera e o clique atual
+                    var normal = new THREE.Vector3();
+
+                    lastclickpoint2.sub(center);
+                    firstclickpoint2.sub(center);
 
                     if(rotaciona){
-                        hj.crossVectors(firstcamera,pcamera);
-                        hj.normalize();
-                        if(selectedObject.name=="teste"){
+                        normal.crossVectors(firstclickpoint2,lastclickpoint2);
+                        normal.normalize();
+                        if(selectedObject.name=="grupo"){
                             selectedObject.traverse(function(obj){
-                                if(obj.name!="teste"){
+                                if(obj.name!="grupo"){
+
+                                    //faz a rotação em relação ao eixo de rotação do grupo
                                     obj.position.sub(new THREE.Vector3().copy(center));
-                                    obj.position.applyAxisAngle(hj, firstcamera.angleTo(pcamera));
+                                    obj.position.applyAxisAngle(normal, firstclickpoint2.angleTo(lastclickpoint2));
                                     obj.position.add(center);
-                                    obj.rotateOnWorldAxis(hj, firstcamera.angleTo(pcamera));
+
+                                    //utiliza a normal como eixo de rotação do objeto e o ângulo entre o último e atual clique
+                                    obj.rotateOnWorldAxis(normal, firstclickpoint2.angleTo(lastclickpoint2));
                                 }
                             })
                         } else {
-                            selectedObject.rotateOnWorldAxis(new THREE.Vector3().copy(hj).normalize(), firstcamera.angleTo(pcamera));
+                            //utiliza a normal como eixo de rotação do objeto e o ângulo entre o último e atual clique
+                            selectedObject.rotateOnWorldAxis(new THREE.Vector3().copy(normal).normalize(), firstclickpoint2.angleTo(lastclickpoint2));
                         }
                     }
-                    firstclickpoint = p;
+                    firstclickpoint = lastclickpoint;
                 }
             }
         }
@@ -274,7 +280,6 @@
                     if(objectsR.children[i].name !== "esfera"){
                         kkk.add(objectsR.children[i].clone(true));
                     }
-                    console.log(objectsR.children[i])
                 }
                 box = new THREE.Box3().setFromObject(kkk);
                 size = box.getSize(new THREE.Vector3());
