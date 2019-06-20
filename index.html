@@ -150,7 +150,6 @@
                 return intersects[0].point;
             } else {
                 var intersects = raycaster.intersectObject(plane);
-                console.log(intersects);
                 return intersects[0].point;
             }
 
@@ -236,7 +235,6 @@
         }
 
         function mouseWheel(event){
-            console.log(event);
             var fator = event.deltaY/100;
             if(camera.zoom > 0.1 || fator<0){
                 camera.zoom = camera.zoom+(0.019*fator*(-1));

@@ -2,7 +2,6 @@
 <project version="4">
   <component name="ChangeListManager">
     <list default="true" id="2d7303c6-73be-4719-bd31-ea99766f440b" name="Default Changelist" comment="Iniciando o Trabalho">
-      <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/index.html" beforeDir="false" afterPath="$PROJECT_DIR$/index.html" afterDir="false" />
     </list>
     <ignored path="$PROJECT_DIR$/.tmp/" />
@@ -19,8 +18,8 @@
       <file pinned="false" current-in-tab="true">
         <entry file="file://$PROJECT_DIR$/index.html">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="596">
-              <caret line="213" column="118" selection-start-line="213" selection-start-column="118" selection-end-line="213" selection-end-column="118" />
+            <state relative-caret-position="290">
+              <caret line="156" lean-forward="true" selection-start-line="156" selection-end-line="156" />
             </state>
           </provider>
         </entry>
@@ -83,6 +82,7 @@
       <find>position</find>
       <find>plane</find>
       <find>teste</find>
+      <find>console.log</find>
     </findStrings>
     <replaceStrings>
       <replace>let</replace>
@@ -184,7 +184,7 @@
       <workItem from="1560386780954" duration="6584000" />
       <workItem from="1560612967319" duration="15704000" />
       <workItem from="1560720367845" duration="9990000" />
-      <workItem from="1560992716726" duration="28859000" />
+      <workItem from="1560992716726" duration="28897000" />
     </task>
     <task id="LOCAL-00001" summary="Iniciando o Trabalho">
       <created>1559009249695</created>
@@ -197,7 +197,7 @@
     <servers />
   </component>
   <component name="TimeTrackingManager">
-    <option name="totallyTimeSpent" value="87252000" />
+    <option name="totallyTimeSpent" value="87290000" />
   </component>
   <component name="ToolWindowManager">
     <frame x="-8" y="-8" width="1936" height="1056" extended-state="6" />
@@ -304,8 +304,8 @@
     </entry>
     <entry file="file://$PROJECT_DIR$/index.html">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="596">
-          <caret line="213" column="118" selection-start-line="213" selection-start-column="118" selection-end-line="213" selection-end-column="118" />
+        <state relative-caret-position="290">
+          <caret line="156" lean-forward="true" selection-start-line="156" selection-end-line="156" />
         </state>
       </provider>
     </entry>
